@@ -22,13 +22,12 @@ from airflow.utils.trigger_rule import TriggerRule
 
 from converter.primitives import Task, Relation
 from mappers.action_mapper import ActionMapper
-from mappers.prepare_mixin import PrepareMixin
+from mappers.prepare_decorator_mapper import add_prepare_element_support_decorator
 from utils import el_utils
 
-from utils.template_utils import render_template
 
-
-class ShellMapper(ActionMapper, PrepareMixin):
+@add_prepare_element_support_decorator
+class ShellMapper(ActionMapper):
     """
     Converts a Shell Oozie action to an Airflow task.
     """
@@ -60,22 +59,16 @@ class ShellMapper(ActionMapper, PrepareMixin):
         self.bash_command = el_utils.convert_el_to_jinja(cmd, quote=False)
         self.pig_command = f"sh {shlex.quote(self.bash_command)}"
 
-    def convert_to_text(self) -> str:
-        prepare_command = self.get_prepare_command(self.oozie_node, self.params)
+    def convert_tasks_and_relations(self):
         tasks = [
-            Task(
-                task_id=self.name + "_prepare",
-                template_name="prepare.tpl",
-                template_params=dict(prepare_command=prepare_command),
-            ),
             Task(
                 task_id=self.name,
                 template_name="shell.tpl",
                 template_params=dict(pig_command=self.pig_command),
-            ),
+            )
         ]
-        relations = [Relation(from_task_id=self.name + "_prepare", to_task_id=self.name)]
-        return render_template(template_name="action.tpl", tasks=tasks, relations=relations)
+        relations = []
+        return tasks, relations
 
     def required_imports(self) -> Set[str]:
         return {"from airflow.utils import dates", "from airflow.contrib.operators import dataproc_operator"}

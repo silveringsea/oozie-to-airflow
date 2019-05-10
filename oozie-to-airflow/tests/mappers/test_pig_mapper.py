@@ -15,7 +15,6 @@
 """Tests pig mapper"""
 import ast
 import unittest
-from unittest import mock
 from xml.etree import ElementTree as ET
 
 from airflow.utils.trigger_rule import TriggerRule
@@ -102,35 +101,21 @@ class TestPigMapper(unittest.TestCase):
             "/user/${wf:user()}/examples/output-data/demo/pig-node", mapper.params_dict["OUTPUT"]
         )
 
-    @mock.patch("mappers.pig_mapper.render_template", return_value="RETURN")
-    def test_convert_to_text(self, render_template_mock):
+    def test_convert_to_text(self):
         params = {"dataproc_cluster": "my-cluster", "gcp_region": "europe-west3", "nameNode": "hdfs://"}
         mapper = self._get_pig_mapper(params=params)
 
-        res = mapper.convert_to_text()
-        self.assertEqual(res, "RETURN")
+        mapper.on_parse_node()
 
-        _, kwargs = render_template_mock.call_args
-        tasks = kwargs["tasks"]
-        relations = kwargs["relations"]
+        tasks, relations = mapper.convert_tasks_and_relations()
 
-        self.assertEqual(kwargs["template_name"], "action.tpl")
         self.assertEqual(
             tasks,
             [
                 Task(
-                    task_id="test_id_prepare",
-                    template_name="prepare.tpl",
-                    template_params={
-                        "prepare_command": "$DAGS_FOLDER/../data/prepare.sh -c my-cluster -r europe-west3 -d "
-                        '"/examples/output-data/demo/pig-node /examples/output-data/demo'
-                        '/pig-node2" -m "/examples/input-data/demo/pig-node /examples'
-                        '/input-data/demo/pig-node2"'
-                    },
-                ),
-                Task(
                     task_id="test_id",
                     template_name="pig.tpl",
+                    trigger_rule="dummy",
                     template_params={
                         "properties": {
                             "mapred.job.queue.name": "${queueName}",
@@ -142,7 +127,7 @@ class TestPigMapper(unittest.TestCase):
                         },
                         "script_file_name": "id.pig",
                     },
-                ),
+                )
             ],
         )
         self.assertEqual(relations, [Relation(from_task_id="test_id_prepare", to_task_id="test_id")])

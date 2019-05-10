@@ -20,14 +20,14 @@ from airflow.utils.trigger_rule import TriggerRule
 
 from converter.primitives import Relation, Task
 from mappers.action_mapper import ActionMapper
-from mappers.prepare_mixin import PrepareMixin
+from mappers.prepare_decorator_mapper import add_prepare_element_support_decorator
 from utils import el_utils, xml_utils
 from utils.file_archive_extractors import ArchiveExtractor, FileExtractor
-from utils.template_utils import render_template
 
 
 # pylint: disable=too-many-instance-attributes
-class MapReduceMapper(ActionMapper, PrepareMixin):
+@add_prepare_element_support_decorator
+class MapReduceMapper(ActionMapper):
     """
     Converts a MapReduce Oozie node to an Airflow task.
     """
@@ -71,15 +71,8 @@ class MapReduceMapper(ActionMapper, PrepareMixin):
                 key, value = param.split("=", 1)
                 self.params_dict[key] = value
 
-    def convert_to_text(self) -> str:
-        prepare_command = self.get_prepare_command(self.oozie_node, self.params)
+    def convert_tasks_and_relations(self):
         tasks = [
-            Task(
-                task_id=self.name + "_prepare",
-                template_name="prepare.tpl",
-                trigger_rule=self.trigger_rule,
-                template_params=dict(prepare_command=prepare_command),
-            ),
             Task(
                 task_id=self.name,
                 template_name="mapreduce.tpl",
@@ -90,10 +83,10 @@ class MapReduceMapper(ActionMapper, PrepareMixin):
                     hdfs_files=self.hdfs_files,
                     hdfs_archives=self.hdfs_archives,
                 ),
-            ),
+            )
         ]
-        relations = [Relation(from_task_id=self.name + "_prepare", to_task_id=self.name)]
-        return render_template(template_name="action.tpl", tasks=tasks, relations=relations)
+        relations = []
+        return tasks, relations
 
     @staticmethod
     def _validate_paths(input_directory_path, output_directory_path):

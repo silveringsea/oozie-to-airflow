@@ -21,10 +21,9 @@ from airflow.utils.trigger_rule import TriggerRule
 from converter.exceptions import ParseException
 from converter.primitives import Relation, Task
 from mappers.action_mapper import ActionMapper
-from mappers.prepare_mixin import PrepareMixin
+from mappers.prepare_decorator_mapper import add_prepare_element_support_decorator
 from utils import xml_utils, el_utils
 from utils.file_archive_extractors import FileExtractor, ArchiveExtractor
-from utils.template_utils import render_template
 
 
 # pylint: disable=too-many-instance-attributes
@@ -39,7 +38,8 @@ SPARK_TAG_CLASS = "class"
 SPARK_TAG_JAR = "jar"
 
 
-class SparkMapper(ActionMapper, PrepareMixin):
+@add_prepare_element_support_decorator
+class SparkMapper(ActionMapper):
     """Maps Spark Action"""
 
     application_args: List[str]
@@ -74,10 +74,6 @@ class SparkMapper(ActionMapper, PrepareMixin):
         self.dataproc_jars = []
 
     def on_parse_node(self):
-
-        if self.has_prepare:
-            self.prepare_command = self.get_prepare_command(oozie_node=self.oozie_node, params=self.params)
-
         _, self.hdfs_files = self.file_extractor.parse_node()
         _, self.hdfs_archives = self.archive_extractor.parse_node()
 
@@ -163,13 +159,8 @@ class SparkMapper(ActionMapper, PrepareMixin):
 
         return conf
 
-    def _get_tasks(self):
-        """
-        Returns the list of Airflow tasks that are the result of mapping
-
-        :return: list of Airflow tasks
-        """
-        action_task = Task(
+    def convert_tasks_and_relations(self):
+        tasks = Task(
             task_id=self.name,
             template_name="spark.tpl",
             trigger_rule=self.trigger_rule,
@@ -184,33 +175,7 @@ class SparkMapper(ActionMapper, PrepareMixin):
                 dataproc_spark_jars=self.dataproc_jars,
             ),
         )
-
-        if not self.has_prepare(self.oozie_node):
-            return [action_task]
-
-        prepare_task = Task(
-            task_id=self.name + "_prepare",
-            template_name="prepare.tpl",
-            template_params=dict(prepare_command=self.prepare_command),
-        )
-        return [prepare_task, action_task]
-
-    def _get_relations(self):
-        """
-        Returns the list of Airflow relations that are the result of mapping
-
-        :return: list of relations
-        """
-        return (
-            [Relation(from_task_id=self.name + "_prepare", to_task_id=self.name)]
-            if self.has_prepare(self.oozie_node)
-            else []
-        )
-
-    def convert_to_text(self):
-        tasks = self._get_tasks()
-        relations = self._get_relations()
-        return render_template(template_name="action.tpl", tasks=tasks, relations=relations)
+        return [tasks], []
 
     def required_imports(self) -> Set[str]:
         # Bash are for the potential prepare statement
@@ -219,7 +184,3 @@ class SparkMapper(ActionMapper, PrepareMixin):
             "from airflow.operators import bash_operator",
             "from airflow.operators import dummy_operator",
         }
-
-    @property
-    def first_task_id(self):
-        return self._get_tasks()[0].task_id

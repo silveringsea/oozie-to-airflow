@@ -21,14 +21,12 @@ from airflow.utils.trigger_rule import TriggerRule
 
 from converter.primitives import Relation, Task
 from mappers.action_mapper import ActionMapper
-from mappers.prepare_mixin import PrepareMixin
 from utils import el_utils, xml_utils
 from utils.file_archive_extractors import ArchiveExtractor, FileExtractor
-from utils.template_utils import render_template
 
 
 # pylint: disable=too-many-instance-attributes
-class PigMapper(ActionMapper, PrepareMixin):
+class PigMapper(ActionMapper):
     """
     Converts a Pig Oozie node to an Airflow task.
     """
@@ -76,15 +74,8 @@ class PigMapper(ActionMapper, PrepareMixin):
                 key, value = param.split("=")
                 self.params_dict[key] = value
 
-    def convert_to_text(self) -> str:
-        prepare_command = self.get_prepare_command(self.oozie_node, self.params)
+    def convert_tasks_and_relations(self):
         tasks = [
-            Task(
-                task_id=self.name + "_prepare",
-                template_name="prepare.tpl",
-                trigger_rule=self.trigger_rule,
-                template_params=dict(prepare_command=prepare_command),
-            ),
             Task(
                 task_id=self.name,
                 template_name="pig.tpl",
@@ -94,10 +85,10 @@ class PigMapper(ActionMapper, PrepareMixin):
                     params_dict=self.params_dict,
                     script_file_name=self.script_file_name,
                 ),
-            ),
+            )
         ]
         relations = [Relation(from_task_id=self.name + "_prepare", to_task_id=self.name)]
-        return render_template(template_name="action.tpl", tasks=tasks, relations=relations)
+        return tasks, relations
 
     def _add_symlinks(self, destination_pig_file):
         destination_pig_file.write("set mapred.create.symlink yes;\n")

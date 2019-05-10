@@ -411,7 +411,7 @@ class TestOozieExamples(unittest.TestCase):
                         Relation(from_task_id="decision_node", to_task_id="first"),
                         Relation(from_task_id="decision_node", to_task_id="kill"),
                     },
-                    params={"nameNode": "hdfs://"},
+                    params={"nameNode": "hdfs://", "gcp_region": "AAA", "dataproc_cluster": "AAAA"},
                 ),
             ),
             (
@@ -438,7 +438,7 @@ class TestOozieExamples(unittest.TestCase):
                         Relation(from_task_id="shell_node", to_task_id="join_node"),
                         Relation(from_task_id="subworkflow_node", to_task_id="join_node"),
                     },
-                    params={"nameNode": "hdfs://", "dataproc_cluster": "AAA"},
+                    params={"nameNode": "hdfs://", "gcp_region": "AAA", "dataproc_cluster": "AAAA"},
                 ),
             ),
             (
@@ -475,7 +475,11 @@ class TestOozieExamples(unittest.TestCase):
                     name="mapreduce",
                     node_names={"mr_node"},
                     relations=set(),
-                    params={"nameNode": "hdfs://localhost:8020/"},
+                    params={
+                        "nameNode": "hdfs://localhost:8020/",
+                        "dataproc_cluster": "AAA",
+                        "gcp_region": "BBB",
+                    },
                 ),
             ),
             (
@@ -488,7 +492,10 @@ class TestOozieExamples(unittest.TestCase):
             ),
             (
                 WorkflowTestCase(
-                    name="shell", node_names={"shell_node"}, relations=set(), params={"nameNode": "hdfs://"}
+                    name="shell",
+                    node_names={"shell_node"},
+                    relations=set(),
+                    params={"nameNode": "hdfs://", "gcp_region": "AAA", "dataproc_cluster": "AAAA"},
                 ),
             ),
             (

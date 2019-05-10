@@ -36,7 +36,9 @@ class TestStartMapper(unittest.TestCase):
 
     def test_convert_to_text(self):
         mapper = self._get_start_mapper()
-        self.assertEqual("", mapper.convert_to_text())
+        tasks, relations = mapper.convert_tasks_and_relations()
+        self.assertEqual(tasks, [])
+        self.assertEqual(relations, [])
 
     def test_required_imports(self):
         mapper = self._get_start_mapper()

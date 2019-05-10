@@ -15,7 +15,6 @@
 """Tests for the MapReduce mapper"""
 import ast
 import unittest
-from unittest import mock
 from xml.etree import ElementTree as ET
 
 from airflow.utils.trigger_rule import TriggerRule
@@ -125,8 +124,7 @@ class TestMapReduceMapper(unittest.TestCase):
             mapper.properties["mapreduce.output.fileoutputformat.outputdir"],
         )
 
-    @mock.patch("mappers.mapreduce_mapper.render_template", return_value="RETURN")
-    def test_convert_to_text(self, render_template_mock):
+    def test_convert_to_text(self):
         mapper = mapreduce_mapper.MapReduceMapper(
             oozie_node=self.mapreduce_node,
             name="test_id",
@@ -141,14 +139,8 @@ class TestMapReduceMapper(unittest.TestCase):
         )
         mapper.on_parse_node()
 
-        res = mapper.convert_to_text()
-        self.assertEqual(res, "RETURN")
+        tasks, relations = mapper.convert_tasks_and_relations()
 
-        _, kwargs = render_template_mock.call_args
-        tasks = kwargs["tasks"]
-        relations = kwargs["relations"]
-
-        self.assertEqual(kwargs["template_name"], "action.tpl")
         self.assertEqual(
             tasks,
             [
@@ -157,7 +149,7 @@ class TestMapReduceMapper(unittest.TestCase):
                     template_name="prepare.tpl",
                     template_params={
                         "prepare_command": "$DAGS_FOLDER/../data/prepare.sh -c my-cluster "
-                        '-r europe-west3 -d "/examples/mapreduce/output"'
+                        "-r europe-west3 -d /examples/mapreduce/output"
                     },
                 ),
                 Task(
