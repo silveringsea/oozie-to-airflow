@@ -13,7 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  #}
-{{ task_variable_name }} = bash_operator.BashOperator(
+{{ task_id | convert_to_python_variable }} = bash_operator.BashOperator(
     task_id='{{ task_id }}',
     trigger_rule='{{ trigger_rule }}',
     bash_command="gcloud dataproc jobs submit pig --cluster={dataproc_cluster} --region={gcp_region} --execute {pig_command}".format(

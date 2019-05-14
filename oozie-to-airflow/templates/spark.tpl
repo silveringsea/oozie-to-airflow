@@ -15,7 +15,7 @@
  #}
 
 
-{{ task_variable_name }} = dataproc_operator.DataProcSparkOperator(
+{{ task_id | convert_to_python_variable }} = dataproc_operator.DataProcSparkOperator(
     task_id='{{ task_id }}',
     {% if main_jar %}main_jar=f'{{ main_jar }}',{% endif %}
     {% if main_class %}main_class=f'{{ main_class }}',{% endif %}

@@ -178,7 +178,6 @@ class DecisionTemplateTestCase(unittest.TestCase, TemplateTestMixin):
 
     DEFAULT_TEMPLATE_PARAMS = dict(
         task_id="aaa",
-        task_variable_name="AAA",
         trigger_rule=TriggerRule.DUMMY,
         case_dict={"first_not_null('', '')": "task1", "True": "task2", "default": "task3"},
     )
@@ -191,7 +190,7 @@ class DecisionTemplateTestCase(unittest.TestCase, TemplateTestMixin):
 class DummyTemplateTestCase(unittest.TestCase, TemplateTestMixin):
     TEMPLATE_NAME = "dummy.tpl"
 
-    DEFAULT_TEMPLATE_PARAMS = dict(task_id="aaa", task_variable_name="AAA", trigger_rule=TriggerRule.DUMMY)
+    DEFAULT_TEMPLATE_PARAMS = dict(task_id="aaa", trigger_rule=TriggerRule.DUMMY)
 
     def test_minimal_green_path(self):
         res = render_template(self.TEMPLATE_NAME, **self.DEFAULT_TEMPLATE_PARAMS)
@@ -203,7 +202,6 @@ class FsOpTemplateTestCase(unittest.TestCase, TemplateTestMixin):
 
     DEFAULT_TEMPLATE_PARAMS = {
         "task_id": "aaa",
-        "task_variable_name": "AAA",
         "trigger_rule": "dummy",
         "pig_command": "AAA",
         "arguments": ["hdfs://localhost:8032/tmp"],
@@ -222,7 +220,7 @@ class FsOpTemplateTestCase(unittest.TestCase, TemplateTestMixin):
 class KillTemplateTestCase(unittest.TestCase, TemplateTestMixin):
     TEMPLATE_NAME = "kill.tpl"
 
-    DEFAULT_TEMPLATE_PARAMS = dict(task_id="aaa", task_variable_name="AAA", trigger_rule=TriggerRule.DUMMY)
+    DEFAULT_TEMPLATE_PARAMS = dict(task_id="aaa", trigger_rule=TriggerRule.DUMMY)
 
     def test_minimal_green_path(self):
         res = render_template(self.TEMPLATE_NAME, **self.DEFAULT_TEMPLATE_PARAMS)
@@ -234,7 +232,6 @@ class MapReduceTemplateTestCase(unittest.TestCase, TemplateTestMixin):
 
     DEFAULT_TEMPLATE_PARAMS = {
         "task_id": "aaa",
-        "task_variable_name": "AAA",
         "trigger_rule": "dummy",
         "properties": {
             "mapred.mapper.new-api": "true",
@@ -268,7 +265,6 @@ class PigTemplateTestCase(unittest.TestCase, TemplateTestMixin):
 
     DEFAULT_TEMPLATE_PARAMS = {
         "task_id": "aaa",
-        "task_variable_name": "AAA",
         "trigger_rule": "dummy",
         "properties": {"mapred.job.queue.name": "${queueName}", "mapred.map.output.compress": "false"},
         "params_dict": {
@@ -308,7 +304,6 @@ class PrepareTemplateTestCase(unittest.TestCase, TemplateTestMixin):
 
     DEFAULT_TEMPLATE_PARAMS = {
         "task_id": "aaa",
-        "task_variable_name": "AAA",
         "trigger_rule": "dummy",
         "prepare_command": "AAAA",
         "prepare_arguments": ["properties", "properties"],
@@ -348,12 +343,7 @@ class RelationsTemplateTestCase(unittest.TestCase, TemplateTestMixin):
 class ShellTemplateTestCase(unittest.TestCase, TemplateTestMixin):
     TEMPLATE_NAME = "shell.tpl"
 
-    DEFAULT_TEMPLATE_PARAMS = {
-        "task_id": "aaa",
-        "task_variable_name": "AAA",
-        "trigger_rule": "dummy",
-        "pig_command": "AAAA",
-    }
+    DEFAULT_TEMPLATE_PARAMS = {"task_id": "aaa", "trigger_rule": "dummy", "pig_command": "AAAA"}
 
     def test_green_path(self):
         res = render_template(self.TEMPLATE_NAME, **self.DEFAULT_TEMPLATE_PARAMS)
@@ -371,7 +361,6 @@ class SparkTemplateTestCase(unittest.TestCase, TemplateTestMixin):
 
     DEFAULT_TEMPLATE_PARAMS = {
         "task_id": "aaa",
-        "task_variable_name": "AAA",
         "trigger_rule": "dummy",
         "archives": [],
         "arguments": ["inputpath=hdfs:///input/file.txt", "value=2"],
@@ -426,7 +415,6 @@ class SshTemplateTestCase(unittest.TestCase, TemplateTestMixin):
 
     DEFAULT_TEMPLATE_PARAMS = {
         "task_id": "AA",
-        "task_variable_name": "aaa",
         "trigger_rule": "dummy",
         "properties": {},
         "command": "ls -l -a",
@@ -461,12 +449,7 @@ class SshTemplateTestCase(unittest.TestCase, TemplateTestMixin):
 class SubwfTemplateTestCase(unittest.TestCase, TemplateTestMixin):
     TEMPLATE_NAME = "subwf.tpl"
 
-    DEFAULT_TEMPLATE_PARAMS = {
-        "task_id": "test-id",
-        "task_variable_name": "TEST_ID",
-        "trigger_rule": "dummy",
-        "app_name": "AAA",
-    }
+    DEFAULT_TEMPLATE_PARAMS = {"task_id": "test-id", "trigger_rule": "dummy", "app_name": "AAA"}
 
     def test_green_path(self):
         res = render_template(self.TEMPLATE_NAME, **self.DEFAULT_TEMPLATE_PARAMS)

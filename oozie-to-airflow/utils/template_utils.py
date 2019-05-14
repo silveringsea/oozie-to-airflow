@@ -18,10 +18,13 @@ from typing import Dict, Any
 import jinja2
 
 from definitions import TPL_PATH
+from utils.variable_name import convert_to_python_variable
 
 TEMPLATE_LOADER = jinja2.FileSystemLoader(searchpath=TPL_PATH)
 TEMPLATE_ENV = jinja2.Environment(loader=TEMPLATE_LOADER, undefined=jinja2.StrictUndefined)
 TEMPLATE_CACHES: Dict[str, Any] = {}
+
+TEMPLATE_ENV.filters["convert_to_python_variable"] = convert_to_python_variable
 
 
 def render_template(template_name: str, *args, **kwargs) -> str:

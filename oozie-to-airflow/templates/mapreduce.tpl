@@ -14,7 +14,7 @@
   limitations under the License.
  #}
 
-{{ task_variable_name }} = dataproc_operator.DataProcHadoopOperator(
+{{ task_id | convert_to_python_variable }} = dataproc_operator.DataProcHadoopOperator(
     task_id='{{ task_id }}',
     trigger_rule='{{ trigger_rule }}',
     main_class=CTX['hadoop_main_class'],

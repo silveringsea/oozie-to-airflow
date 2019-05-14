@@ -14,7 +14,7 @@
   limitations under the License.
  #}
 
-{{ task_variable_name }} = dummy_operator.DummyOperator(
+{{ task_id | convert_to_python_variable }} = dummy_operator.DummyOperator(
     task_id='{{ task_id }}',
     trigger_rule=r'{{ trigger_rule}}'
 )

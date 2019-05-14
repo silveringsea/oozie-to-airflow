@@ -29,5 +29,5 @@ class StartMapper(BaseMapper):
         super().on_parse_finish(self)
         del workflow.nodes[self.name]
         workflow.relations -= {
-            relation for relation in workflow.relations if relation.from_task_variable_name == self.name
+            relation for relation in workflow.relations if relation.from_task_id == self.name
         }

@@ -14,7 +14,7 @@
   limitations under the License.
  #}
 
-{{ task_variable_name }} = SubDagOperator(
+{{ task_id | convert_to_python_variable }} = SubDagOperator(
     task_id='{{ task_id }}',
     trigger_rule='{{ trigger_rule }}',
     subdag=subdag_{{ app_name }}_sub_dag(dag.dag_id, f'{{ task_id }}', dag.start_date, dag.schedule_interval),

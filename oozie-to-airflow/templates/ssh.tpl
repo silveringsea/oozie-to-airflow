@@ -14,14 +14,14 @@
   limitations under the License.
  #}
 
-{{ task_variable_name }}_hook = ssh_hook.SSHHook(
+{{ task_id | convert_to_python_variable }}_hook = ssh_hook.SSHHook(
     ssh_conn_id='ssh_default',
     username=f'{{ user }}',
     remote_host=f'{{ host }}',
 )
 
-{{ task_variable_name }} = ssh_operator.SSHOperator(
-    ssh_hook={{ task_variable_name }}_hook,
+{{ task_id | convert_to_python_variable }} = ssh_operator.SSHOperator(
+    ssh_hook={{ task_id | convert_to_python_variable }}_hook,
     task_id='{{ task_id }}',
     trigger_rule='{{ trigger_rule }}',
     params=CTX.properties,

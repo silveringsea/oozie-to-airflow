@@ -21,7 +21,6 @@ from orderedset import OrderedSet
 from airflow.utils.trigger_rule import TriggerRule
 
 from utils.template_utils import render_template
-from utils.variable_name import convert_to_python_variable
 
 
 class Relation(NamedTuple):
@@ -29,14 +28,6 @@ class Relation(NamedTuple):
 
     from_task_id: str
     to_task_id: str
-
-    @property
-    def from_task_variable_name(self):
-        return convert_to_python_variable(self.from_task_id)
-
-    @property
-    def to_task_variable_name(self):
-        return convert_to_python_variable(self.to_task_id)
 
 
 # This is a container for data, so it does not contain public methods intentionally.
@@ -96,16 +87,11 @@ class Task:  # pylint: disable=too-few-public-methods
         self.template_params: Dict[str, Any] = template_params or {}
 
     @property
-    def task_variable_name(self):
-        return convert_to_python_variable(self.task_id)
-
-    @property
     def rendered_template(self):
         return render_template(
             template_name=self.template_name,
             task_id=self.task_id,
             trigger_rule=self.trigger_rule,
-            task_variable_name=self.task_variable_name,
             **self.template_params,
         )
 

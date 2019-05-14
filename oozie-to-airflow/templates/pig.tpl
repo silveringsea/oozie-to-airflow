@@ -14,7 +14,7 @@
   limitations under the License.
  #}
 
-{{ task_variable_name }} = dataproc_operator.DataProcPigOperator(
+{{ task_id | convert_to_python_variable }} = dataproc_operator.DataProcPigOperator(
     query_uri='{}/{}'.format(CTX['gcp_uri_prefix'], f'{{ script_file_name }}'),
     task_id='{{ task_id }}',
     trigger_rule='{{ trigger_rule }}',

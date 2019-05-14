@@ -14,7 +14,7 @@
   limitations under the License.
  #}
 
-def {{ task_variable_name }}_decision():
+def {{ task_id | convert_to_python_variable }}_decision():
 {% for key, val in case_dict.items() -%}
 {%- if loop.first %}
     if f'{{ key }}' == 'True':
@@ -30,8 +30,8 @@ def {{ task_variable_name }}_decision():
 {%- endfor %}
 
 
-{{ task_variable_name }} = python_operator.BranchPythonOperator(
+{{ task_id | convert_to_python_variable }} = python_operator.BranchPythonOperator(
     task_id='{{ task_id }}',
     trigger_rule='{{ trigger_rule}}',
-    python_callable={{ task_variable_name }}_decision,
+    python_callable={{ task_id | convert_to_python_variable }}_decision,
 )
