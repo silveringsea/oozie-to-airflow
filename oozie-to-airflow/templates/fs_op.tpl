@@ -19,6 +19,6 @@
     bash_command="gcloud dataproc jobs submit pig --cluster={dataproc_cluster} --region={gcp_region} --execute {pig_command}".format(
         dataproc_cluster=CTX['dataproc_cluster'],
         gcp_region=CTX['gcp_region'],
-        pig_command='{{ pig_command }}'.format({% for argument in arguments %}f'{{ argument }}',{% endfor %})
+        pig_command='{{ pig_command.text }}'.format({% for argument in pig_command.arguments %}f'{{ argument }}',{% endfor %})
     )
 )

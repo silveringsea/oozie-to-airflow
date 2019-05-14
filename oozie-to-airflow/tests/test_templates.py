@@ -22,7 +22,7 @@ from typing import Dict, Any, Union, List
 from parameterized import parameterized
 from airflow.utils.trigger_rule import TriggerRule
 
-from converter.primitives import Task, Relation
+from converter.primitives import Task, Relation, TextTemplate
 from utils.template_utils import render_template
 
 DELETE_MARKER: Any = {}
@@ -205,8 +205,7 @@ class FsOpTemplateTestCase(unittest.TestCase, TemplateTestMixin):
         "task_id": "aaa",
         "task_variable_name": "AAA",
         "trigger_rule": "dummy",
-        "pig_command": "AAA",
-        "arguments": ["hdfs://localhost:8032/tmp"],
+        "pig_command": TextTemplate("AAA", ["hdfs://localhost:8032/tmp"]),
     }
 
     def test_minimal_green_path(self):
@@ -214,7 +213,10 @@ class FsOpTemplateTestCase(unittest.TestCase, TemplateTestMixin):
         self.assertValidPython(res)
 
     def test_quote_escape(self):
-        template_params = {**self.DEFAULT_TEMPLATE_PARAMS, **dict(pig_command='AA"AA"')}
+        template_params = {
+            **self.DEFAULT_TEMPLATE_PARAMS,
+            **dict(pig_command=TextTemplate('A"AA', ["hdfs://localhost:8032/tmp"])),
+        }
         res = render_template(self.TEMPLATE_NAME, **template_params)
         self.assertValidPython(res)
 

@@ -14,7 +14,7 @@
 # limitations under the License.
 """Class for Airflow relation"""
 from collections import OrderedDict
-from typing import Any, Dict, Optional, Set, NamedTuple
+from typing import Any, Dict, Optional, Set, NamedTuple, List
 
 from orderedset import OrderedSet
 
@@ -114,10 +114,15 @@ class Task:  # pylint: disable=too-few-public-methods
             f'Task(task_id="{self.task_id}", '
             f'template_name="{self.template_name}", '
             f'trigger_rule="{self.trigger_rule}", '
-            f"template_params={self.template_params}, "
+            f"template_params={self.template_params}) "
         )
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return self.__dict__ == other.__dict__
         return False
+
+
+class TextTemplate(NamedTuple):
+    text: str
+    arguments: List[str]

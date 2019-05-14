@@ -22,7 +22,7 @@ from xml.etree import ElementTree as ET
 from parameterized import parameterized
 from airflow.utils.trigger_rule import TriggerRule
 
-from converter.primitives import Task, Relation
+from converter.primitives import Task, Relation, TextTemplate
 from mappers import fs_mapper
 
 TEST_PARAMS = {"user.name": "pig", "nameNode": "hdfs://localhost:8020"}
@@ -206,9 +206,11 @@ class FsMapperSingleTestCase(unittest.TestCase):
                 Task(
                     task_id="test-id",
                     template_name="fs_op.tpl",
+                    trigger_rule="dummy",
                     template_params={
-                        "pig_command": "fs -mkdir -p \\'{}\\'",
-                        "arguments": ["/home/pig/test-delete-1"],
+                        "pig_command": TextTemplate(
+                            text="fs -mkdir -p \\'{}\\'", arguments=["/home/pig/test-delete-1"]
+                        )
                     },
                 )
             ],
@@ -312,153 +314,195 @@ class FsMapperComplexTestCase(unittest.TestCase):
 
         self.assertEqual(kwargs["template_name"], "action.tpl")
         self.assertEqual(
+            tasks,
             [
                 Task(
                     task_id="test-id-fs-0-mkdir",
                     template_name="fs_op.tpl",
+                    trigger_rule="dummy",
                     template_params={
-                        "pig_command": "fs -mkdir -p \\'{}\\'",
-                        "arguments": ["/home/pig/test-delete-1"],
+                        "pig_command": TextTemplate(
+                            text="fs -mkdir -p \\'{}\\'", arguments=["/home/pig/test-delete-1"]
+                        )
                     },
                 ),
                 Task(
                     task_id="test-id-fs-1-mkdir",
                     template_name="fs_op.tpl",
+                    trigger_rule="dummy",
                     template_params={
-                        "pig_command": "fs -mkdir -p \\'{}\\'",
-                        "arguments": ["/home/pig/test-delete-2"],
+                        "pig_command": TextTemplate(
+                            text="fs -mkdir -p \\'{}\\'", arguments=["/home/pig/test-delete-2"]
+                        )
                     },
                 ),
                 Task(
                     task_id="test-id-fs-2-mkdir",
                     template_name="fs_op.tpl",
+                    trigger_rule="dummy",
                     template_params={
-                        "pig_command": "fs -mkdir -p \\'{}\\'",
-                        "arguments": ["/home/pig/test-delete-1"],
+                        "pig_command": TextTemplate(
+                            text="fs -mkdir -p \\'{}\\'", arguments=["/home/pig/test-delete-1"]
+                        )
                     },
                 ),
                 Task(
                     task_id="test-id-fs-3-mkdir",
                     template_name="fs_op.tpl",
+                    trigger_rule="dummy",
                     template_params={
-                        "pig_command": "fs -mkdir -p \\'{}\\'",
-                        "arguments": ["/home/pig/test-delete-2"],
+                        "pig_command": TextTemplate(
+                            text="fs -mkdir -p \\'{}\\'", arguments=["/home/pig/test-delete-2"]
+                        )
                     },
                 ),
                 Task(
                     task_id="test-id-fs-4-mkdir",
                     template_name="fs_op.tpl",
+                    trigger_rule="dummy",
                     template_params={
-                        "pig_command": "fs -mkdir -p \\'{}\\'",
-                        "arguments": ["/home/pig/test-delete-3"],
+                        "pig_command": TextTemplate(
+                            text="fs -mkdir -p \\'{}\\'", arguments=["/home/pig/test-delete-3"]
+                        )
                     },
                 ),
                 Task(
                     task_id="test-id-fs-5-delete",
                     template_name="fs_op.tpl",
+                    trigger_rule="dummy",
                     template_params={
-                        "pig_command": "fs -rm -r \\'{}\\'",
-                        "arguments": ["/home/pig/test-delete-1"],
+                        "pig_command": TextTemplate(
+                            text="fs -rm -r \\'{}\\'", arguments=["/home/pig/test-delete-1"]
+                        )
                     },
                 ),
                 Task(
                     task_id="test-id-fs-6-mkdir",
                     template_name="fs_op.tpl",
+                    trigger_rule="dummy",
                     template_params={
-                        "pig_command": "fs -mkdir -p \\'{}\\'",
-                        "arguments": ["/home/pig/test-delete-1"],
+                        "pig_command": TextTemplate(
+                            text="fs -mkdir -p \\'{}\\'", arguments=["/home/pig/test-delete-1"]
+                        )
                     },
                 ),
                 Task(
                     task_id="test-id-fs-7-move",
                     template_name="fs_op.tpl",
+                    trigger_rule="dummy",
                     template_params={
-                        "pig_command": "fs -mv \\'{}\\' \\'{}\\'",
-                        "arguments": ["/home/pig/test-chmod-1", "/home/pig/test-chmod-2"],
+                        "pig_command": TextTemplate(
+                            text="fs -mv \\'{}\\' \\'{}\\'",
+                            arguments=["/home/pig/test-chmod-1", "/home/pig/test-chmod-2"],
+                        )
                     },
                 ),
                 Task(
                     task_id="test-id-fs-8-mkdir",
                     template_name="fs_op.tpl",
+                    trigger_rule="dummy",
                     template_params={
-                        "pig_command": "fs -mkdir -p \\'{}\\'",
-                        "arguments": ["/home/pig/test-chmod-1"],
+                        "pig_command": TextTemplate(
+                            text="fs -mkdir -p \\'{}\\'", arguments=["/home/pig/test-chmod-1"]
+                        )
                     },
                 ),
                 Task(
                     task_id="test-id-fs-9-mkdir",
                     template_name="fs_op.tpl",
+                    trigger_rule="dummy",
                     template_params={
-                        "pig_command": "fs -mkdir -p \\'{}\\'",
-                        "arguments": ["/home/pig/test-chmod-2"],
+                        "pig_command": TextTemplate(
+                            text="fs -mkdir -p \\'{}\\'", arguments=["/home/pig/test-chmod-2"]
+                        )
                     },
                 ),
                 Task(
                     task_id="test-id-fs-10-mkdir",
                     template_name="fs_op.tpl",
+                    trigger_rule="dummy",
                     template_params={
-                        "pig_command": "fs -mkdir -p \\'{}\\'",
-                        "arguments": ["/home/pig/test-chmod-3"],
+                        "pig_command": TextTemplate(
+                            text="fs -mkdir -p \\'{}\\'", arguments=["/home/pig/test-chmod-3"]
+                        )
                     },
                 ),
                 Task(
                     task_id="test-id-fs-11-mkdir",
                     template_name="fs_op.tpl",
+                    trigger_rule="dummy",
                     template_params={
-                        "pig_command": "fs -mkdir -p \\'{}\\'",
-                        "arguments": ["/home/pig/test-chmod-4"],
+                        "pig_command": TextTemplate(
+                            text="fs -mkdir -p \\'{}\\'", arguments=["/home/pig/test-chmod-4"]
+                        )
                     },
                 ),
                 Task(
                     task_id="test-id-fs-12-chmod",
                     template_name="fs_op.tpl",
+                    trigger_rule="dummy",
                     template_params={
-                        "pig_command": "fs -chmod {} \\'{}\\' \\'{}\\'",
-                        "arguments": ["", "-rwxrw-rw-", "/home/pig/test-chmod-1"],
+                        "pig_command": TextTemplate(
+                            text="fs -chmod {} \\'{}\\' \\'{}\\'",
+                            arguments=["", "-rwxrw-rw-", "/home/pig/test-chmod-1"],
+                        )
                     },
                 ),
                 Task(
                     task_id="test-id-fs-13-chmod",
                     template_name="fs_op.tpl",
+                    trigger_rule="dummy",
                     template_params={
-                        "pig_command": "fs -chmod {} \\'{}\\' \\'{}\\'",
-                        "arguments": ["", "-rwxrw-rw-", "/home/pig/test-chmod-2"],
+                        "pig_command": TextTemplate(
+                            text="fs -chmod {} \\'{}\\' \\'{}\\'",
+                            arguments=["", "-rwxrw-rw-", "/home/pig/test-chmod-2"],
+                        )
                     },
                 ),
                 Task(
                     task_id="test-id-fs-14-chmod",
                     template_name="fs_op.tpl",
+                    trigger_rule="dummy",
                     template_params={
-                        "pig_command": "fs -chmod {} \\'{}\\' \\'{}\\'",
-                        "arguments": ["", "-rwxrw-rw-", "/home/pig/test-chmod-3"],
+                        "pig_command": TextTemplate(
+                            text="fs -chmod {} \\'{}\\' \\'{}\\'",
+                            arguments=["", "-rwxrw-rw-", "/home/pig/test-chmod-3"],
+                        )
                     },
                 ),
                 Task(
                     task_id="test-id-fs-15-chmod",
                     template_name="fs_op.tpl",
+                    trigger_rule="dummy",
                     template_params={
-                        "pig_command": "fs -chmod {} \\'{}\\' \\'{}\\'",
-                        "arguments": ["-R", "-rwxrw-rw-", "/home/pig/test-chmod-4"],
+                        "pig_command": TextTemplate(
+                            text="fs -chmod {} \\'{}\\' \\'{}\\'",
+                            arguments=["-R", "-rwxrw-rw-", "/home/pig/test-chmod-4"],
+                        )
                     },
                 ),
                 Task(
                     task_id="test-id-fs-16-touchz",
                     template_name="fs_op.tpl",
+                    trigger_rule="dummy",
                     template_params={
-                        "pig_command": "fs -touchz \\'{}\\'",
-                        "arguments": ["/home/pig/test-touchz-1"],
+                        "pig_command": TextTemplate(
+                            text="fs -touchz \\'{}\\'", arguments=["/home/pig/test-touchz-1"]
+                        )
                     },
                 ),
                 Task(
                     task_id="test-id-fs-17-chgrp",
                     template_name="fs_op.tpl",
+                    trigger_rule="dummy",
                     template_params={
-                        "pig_command": "fs -chgrp {} \\'{}\\' \\'{}\\'",
-                        "arguments": ["", "pig", "/home/pig/test-touchz-1"],
+                        "pig_command": TextTemplate(
+                            text="fs -chgrp {} \\'{}\\' \\'{}\\'",
+                            arguments=["", "pig", "/home/pig/test-touchz-1"],
+                        )
                     },
                 ),
             ],
-            tasks,
         )
         self.assertEqual(
             relations,

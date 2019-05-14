@@ -14,12 +14,12 @@
 # limitations under the License.
 """Maps FS node to Airflow's DAG"""
 
-from typing import Set, Dict, List, Tuple
+from typing import Set, Dict, List
 from xml.etree.ElementTree import Element
 
 from airflow.utils.trigger_rule import TriggerRule
 
-from converter.primitives import Task
+from converter.primitives import Task, TextTemplate
 from mappers.action_mapper import ActionMapper
 from utils.relation_utils import chain
 from utils.template_utils import render_template
@@ -43,30 +43,30 @@ FS_TAG_PERMISSIONS = "permissions"
 FS_TAG_GROUP = "group"
 
 
-def prepare_mkdir_command(node: Element, properties: Dict[str, str]) -> Tuple[str, List[str]]:
+def prepare_mkdir_command(node: Element, properties: Dict[str, str]) -> TextTemplate:
     path = normalize_path_by_adding_hdfs_if_needed(node.attrib[FS_TAG_PATH], properties)
     command = "fs -mkdir -p \\'{}\\'"
-    return command, [path]
+    return TextTemplate(command, [path])
 
 
-def prepare_delete_command(node: Element, properties: Dict[str, str]) -> Tuple[str, List[str]]:
+def prepare_delete_command(node: Element, properties: Dict[str, str]) -> TextTemplate:
     path = normalize_path_by_adding_hdfs_if_needed(node.attrib[FS_TAG_PATH], properties)
     command = "fs -rm -r \\'{}\\'"
 
-    return command, [path]
+    return TextTemplate(command, [path])
 
 
-def prepare_move_command(node: Element, properties: Dict[str, str]) -> Tuple[str, List[str]]:
+def prepare_move_command(node: Element, properties: Dict[str, str]) -> TextTemplate:
     source = normalize_path_by_adding_hdfs_if_needed(node.attrib[FS_TAG_SOURCE], properties)
     target = normalize_path_by_adding_hdfs_if_needed(
         node.attrib[FS_TAG_TARGET], properties, allow_no_schema=True
     )
 
     command = "fs -mv \\'{}\\' \\'{}\\'"
-    return command, [source, target]
+    return TextTemplate(command, [source, target])
 
 
-def prepare_chmod_command(node: Element, properties: Dict[str, str]) -> Tuple[str, List[str]]:
+def prepare_chmod_command(node: Element, properties: Dict[str, str]) -> TextTemplate:
     path = normalize_path_by_adding_hdfs_if_needed(node.attrib[FS_TAG_PATH], properties)
     permission = node.attrib[FS_TAG_PERMISSIONS]
     # TODO: Add support for dirFiles Reference: GH issues #80
@@ -75,17 +75,17 @@ def prepare_chmod_command(node: Element, properties: Dict[str, str]) -> Tuple[st
     extra_param = "-R" if recursive else ""
 
     command = "fs -chmod {} \\'{}\\' \\'{}\\'"
-    return command, [extra_param, permission, path]
+    return TextTemplate(command, [extra_param, permission, path])
 
 
-def prepare_touchz_command(node: Element, properties: Dict[str, str]) -> Tuple[str, List[str]]:
+def prepare_touchz_command(node: Element, properties: Dict[str, str]) -> TextTemplate:
     path = normalize_path_by_adding_hdfs_if_needed(node.attrib[FS_TAG_PATH], properties)
 
     command = "fs -touchz \\'{}\\'"
-    return command, [path]
+    return TextTemplate(command, [path])
 
 
-def prepare_chgrp_command(node: Element, properties: Dict[str, str]) -> Tuple[str, List[str]]:
+def prepare_chgrp_command(node: Element, properties: Dict[str, str]) -> TextTemplate:
     path = normalize_path_by_adding_hdfs_if_needed(node.attrib[FS_TAG_PATH], properties)
     group = node.attrib[FS_TAG_GROUP]
 
@@ -93,7 +93,7 @@ def prepare_chgrp_command(node: Element, properties: Dict[str, str]) -> Tuple[st
     extra_param = "-R" if recursive else ""
 
     command = "fs -chgrp {} \\'{}\\' \\'{}\\'"
-    return command, [extra_param, group, path]
+    return TextTemplate(command, [extra_param, group, path])
 
 
 FS_OPERATION_MAPPERS = {
@@ -157,10 +157,6 @@ class FsMapper(ActionMapper):
         if not mapper_fn:
             raise Exception("Unknown FS operation: {}".format(tag_name))
 
-        pig_command, arguments = mapper_fn(node, self.properties)
+        pig_command = mapper_fn(node, self.properties)
 
-        return Task(
-            task_id=task_id,
-            template_name="fs_op.tpl",
-            template_params=dict(pig_command=pig_command, arguments=arguments),
-        )
+        return Task(task_id=task_id, template_name="fs_op.tpl", template_params=dict(pig_command=pig_command))
