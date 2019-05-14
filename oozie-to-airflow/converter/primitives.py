@@ -14,7 +14,7 @@
 # limitations under the License.
 """Class for Airflow relation"""
 from collections import OrderedDict
-from typing import Any, Dict, Optional, Set
+from typing import Any, Dict, Optional, Set, NamedTuple
 
 from orderedset import OrderedSet
 
@@ -24,12 +24,11 @@ from utils.template_utils import render_template
 from utils.variable_name import convert_to_python_variable
 
 
-class Relation:
+class Relation(NamedTuple):
     """Class for Airflow relation"""
 
-    def __init__(self, from_task_id: str, to_task_id: str):
-        self.from_task_id: str = from_task_id
-        self.to_task_id: str = to_task_id
+    from_task_id: str
+    to_task_id: str
 
     @property
     def from_task_variable_name(self):
@@ -38,20 +37,6 @@ class Relation:
     @property
     def to_task_variable_name(self):
         return convert_to_python_variable(self.to_task_id)
-
-    def __eq__(self, other):
-        if not isinstance(other, Relation):
-            # don't attempt to compare against unrelated types
-            return NotImplemented
-
-        return self.from_task_id == other.from_task_id and self.to_task_id == other.to_task_id
-
-    def __hash__(self):
-        return hash((self.from_task_id, self.to_task_id))
-
-    def __repr__(self):
-        items = ("%s = %r" % (k, v) for k, v in self.__dict__.items())
-        return "<%s: {%s}>" % (self.__class__.__name__, ", ".join(items))
 
 
 # This is a container for data, so it does not contain public methods intentionally.
