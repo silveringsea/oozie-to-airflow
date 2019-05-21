@@ -1,9 +1,9 @@
-apache-airflow==1.10.1 # pyup: ignore
+apache-airflow==1.10.2 # pyup: ignore
 black==19.3b0
 flake8==3.7.7
 google-api-python-client==1.7.8
 j2cli==0.3.8
-Jinja2==2.10.1
+Jinja2==2.10.1 # pyup: ignore
 mypy==0.701
 parameterized==0.7.0
 paramiko==2.4.2
@@ -13,4 +13,5 @@ pylint==2.3.1
 pytest-cov==2.7.1
 safety==1.8.5
 sshtunnel==0.1.4
+twine==1.13.0
 yamllint==1.15.0
