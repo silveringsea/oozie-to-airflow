@@ -28,6 +28,10 @@ class ActionMapper(BaseMapper):
     properties: Dict[str, str] = {}
 
     def _parse_config(self):
+        self.properties = {}  # This could probably be done better - think about it.
+        # If 'properties' is defined inside '_parse_config', we get:
+        # W0201: Attribute 'properties' defined outside __init__ (attribute-defined-outside-init)
+        # If in __init__ here then we'd need to copy __init__ from BaseMapper.
         config = self.oozie_node.find("configuration")
         if config:
             property_nodes = xml_utils.find_nodes_by_tag(config, "property")
