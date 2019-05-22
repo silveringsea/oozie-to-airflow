@@ -22,6 +22,8 @@ import os
 
 import logging
 
+from isort import SortImports
+
 import black
 
 from o2a.converter import parser
@@ -135,6 +137,7 @@ class OozieConverter:
         black.format_file_in_place(
             Path(file_name), mode=black.FileMode(line_length=110), fast=False, write_back=black.WriteBack.YES
         )
+        SortImports(file_name)
 
     def copy_extra_assets(self, nodes: Dict[str, ParsedNode]):
         """
@@ -162,6 +165,6 @@ class OozieConverter:
             params=converted_params,
             relations=workflow.relations,
             nodes=list(workflow.nodes.values()),
-            dependencies=sorted(workflow.dependencies),
+            dependencies=workflow.dependencies,
         )
         return dag_file

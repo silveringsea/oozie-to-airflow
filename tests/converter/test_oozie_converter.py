@@ -58,7 +58,8 @@ class TestOozieConverter(TestCase):
     @mock.patch("o2a.converter.oozie_converter.render_template", return_value="AAA")
     @mock.patch("builtins.open", return_value=io.StringIO())
     @mock.patch("o2a.converter.oozie_converter.black")
-    def test_create_dag_file(self, black_mock, open_mock, _):
+    @mock.patch("o2a.converter.oozie_converter.SortImports")
+    def test_create_dag_file(self, sort_imports_mock, black_mock, open_mock, _):
         workflow = Workflow(
             dag_name="A",
             input_directory_path="in_dir",
@@ -73,6 +74,7 @@ class TestOozieConverter(TestCase):
         black_mock.format_file_in_place.assert_called_once_with(
             Path("/tmp/test_dag.py"), fast=mock.ANY, mode=mock.ANY, write_back=mock.ANY
         )
+        sort_imports_mock.assert_called_once_with("/tmp/test_dag.py")
 
     @mock.patch("o2a.converter.oozie_converter.render_template", return_value="TEXT_CONTENT")
     def test_write_dag_file(self, render_template_mock):
@@ -92,7 +94,7 @@ class TestOozieConverter(TestCase):
 
         render_template_mock.assert_called_once_with(
             dag_name="test_dag",
-            dependencies=["import awesome_stuff"],
+            dependencies={"import awesome_stuff"},
             nodes=[nodes["TASK_1"]],
             params={"user.name": "USER"},
             relations={Relation(from_task_id="TASK_1", to_task_id="TASK_2")},
